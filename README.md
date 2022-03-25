@@ -1,7 +1,7 @@
 # MVC-NodeJS
 NodeJS MVC Design Pattern Boilerplate
 
-1. install all the module packages 📦 📦 📦
+1. install all the package modules 📦 📦 📦
 ```
 npm i
 ```
