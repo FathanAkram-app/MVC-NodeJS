@@ -1,14 +1,25 @@
 const express = require('express')
 const cors=require("cors");
+// const fs = require('fs')
 
 const app = express()
-const port = 3000
+
 const bodyParser = require('body-parser')
 
+// https
+// const https = require('https');
+// const server = https.createServer({
+//   key:fs.readFileSync(__dirname+"/certificate/key.pem"),
+//   cert:fs.readFileSync(__dirname+"/certificate/cert.pem")
+// },app);
+// const port = 3443 
 
 const http = require('http');
-const { initRoutes } = require('./app/routes')
 const server = http.createServer(app);
+const port = 3000 
+
+const { initRoutes } = require('./app/routes')
+
 app.use(express.static(__dirname+'/public'));
 
 const { Server } = require("socket.io");
@@ -32,6 +43,6 @@ initRoutes(app)
 initSocketConnection(io)
 
 server.listen(port, () => {
-  console.log(`listening at http://localhost:${port}`)
+  console.log(`🚀 listening on port ${port} 🚀`)
 })
 
