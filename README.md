@@ -6,9 +6,18 @@ NodeJS MVC Design Pattern Boilerplate
 npm i
 ```
 
-2. run the server 🚀 🚀 🚀
+2. configure your .env settings ⚙️ ⚙️ ⚙️
+```
+DB_USER=something
+DB_HOST=something
+DB_NAME=something
+DB_PASS=somthing
+DB_PORT=something
+```
+
+3. run the server 🚀 🚀 🚀
 ```
 npx nodemon index.js
 ```
 
-3. happy hacking 💜 💜 💜
+4. happy hacking 💜 💜 💜
