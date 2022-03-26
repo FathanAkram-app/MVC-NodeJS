@@ -21,3 +21,15 @@ npx nodemon index.js
 ```
 
 4. happy hacking 💜 💜 💜
+
+
+### Modules
+- socket.io
+- express
+- bcrypt
+- body-parser
+- morgan
+- cors
+- dotenv
+- nodemon
+- mongodb

@@ -25,49 +25,27 @@ module.exports = {
                                 res.send(loginFailedResponse)
                             }
                         });
-                        
-
                     }
-
                 })
             }else{
                 res.send(clientAuthFailedResponse)
             }
         });
     },
+
     registerController : (req, res) => {
-        
+
         if(clientAuthentication(req)){
             bcrypt.genSalt(10, function(err, salt) {
                 const data = auth(req)
                 bcrypt.hash(data.password, salt, function(err, hash) {
-
-                    if (checkRequirements(data)[0]) {
-                        registerDB({...data, password: hash}).then((result)=>{
-                            if (result == null) {
-                                res.send(successWithMessageResponse("successfully registered an account"))
-                            }else{ 
-                                if (result.detail.search("already exists.")){
-                                    res.send(failedWithMessageResponse(400,"username is not available"))
-                                }else{
-                                    res.send(failedWithMessageResponse(400,"oops, you did something wrong"))
-                                }
-                                
-                            }
-                            
-                        })
-                        
-                    } else{
-                        res.send(failedWithMessageResponse(400,checkRequirements(data)[1]))
-                    }
-                    
-                    
+                    if (checkRequirements(data)[0]) registerDB({...data, password: hash},res)
+                    else res.send(failedWithMessageResponse(400,checkRequirements(data)[1]))
                 });
             });
-        }else{
-            res.send(clientAuthFailedResponse)
-        }
+        }else res.send(clientAuthFailedResponse)
     },
+
     logoutController : (req, res) => {
         if(clientAuthentication(req)){
             logoutDB(auth(req).token).then((data)=>{

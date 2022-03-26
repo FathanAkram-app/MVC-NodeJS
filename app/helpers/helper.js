@@ -1,6 +1,10 @@
 const { Client } = require('pg')
 const version = require('../../package.json')
 require('dotenv').config()
+const { MongoClient } = require("mongodb");
+const mongoUri = 'mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.3.1'
+const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+
 
 module.exports = {
     checkRequirements : (data) => {
@@ -61,6 +65,17 @@ module.exports = {
             return false
         }
         
+    },
+    mClientTest: async ()=>{
+        try {
+            await client.connect();
+            await client.db("testing").command({ ping: 1 });
+
+            console.log("Connected successfully to database server");
+        } finally {
+            await client.close();
+            
+        }
     },
     auth: (req)=>{
         return JSON.parse(Buffer.from(req.headers.authorization, 'base64').toString('ascii'))
