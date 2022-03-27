@@ -22,7 +22,7 @@ class User{
         }
     }
 }
-const getDBCollection = (err, db, res) => {
+const checkDBError = (err, res) => {
     if (err) {
         res.send(failedWithMessageResponse(400,"something went wrong"))
         
@@ -36,11 +36,9 @@ module.exports = {
         try {
             const user = new User(data.username, data.password, data.email, data.nama)
             MongoClient.connect(mongoUri, (err,db)=>{
-                
-                
                 var dbo = db.db("testing");
                 var dbUsers = dbo.collection("users")
-                getDBCollection(err,db,res)
+                checkDBError(err,res)
                     .then(async (err)=>{
                         if (!err) {
                             return await dbUsers.findOne({username: user.jsonObject().username}), null
