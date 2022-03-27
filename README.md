@@ -22,6 +22,10 @@ npx nodemon index.js
 
 4. happy hacking 💜 💜 💜
 
+## Implemented OWASP Security
+- No Callback Hell
+- Password and Email Validation
+- Unique Username/Email
 
 ### Modules
 - socket.io
@@ -33,8 +37,3 @@ npx nodemon index.js
 - dotenv
 - nodemon
 - mongodb
-
-## Implemented OWASP Security
-- No Callback Hell
-- Password and Email Validation
-- Unique Username/Email
