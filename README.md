@@ -33,3 +33,8 @@ npx nodemon index.js
 - dotenv
 - nodemon
 - mongodb
+
+## Implemented OWASP Security
+- No Callback Hell
+- Password and Email Validation
+- Unique Username/Email
