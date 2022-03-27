@@ -6,7 +6,7 @@ NodeJS MVC Design Pattern Boilerplate
 npm i
 ```
 
-2. configure your .env settings ⚙️ ⚙️ ⚙️
+2. configure your .env file settings ⚙️ ⚙️ ⚙️
 ```
 DB_USER=something
 DB_HOST=something
