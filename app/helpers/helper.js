@@ -4,6 +4,7 @@ require('dotenv').config()
 const { MongoClient } = require("mongodb");
 const mongoUri = 'mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.3.1'
 const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+var validator = require('validator');
 
 
 module.exports = {
@@ -21,9 +22,9 @@ module.exports = {
         }
         let checkEmail = () => {
             if (data["email"] != null) {
-                const a = data["email"].search("@") > 0 && data["email"].search(/\s/g) < 0;
+                const a = validator.isEmail(data["email"])
                 if (!a) {
-                    return [a,"Invalid format on email"]
+                    return [a,"Invalid email format"]
                 }
                 return [a,"Please fill email"]
             }else{
@@ -33,9 +34,9 @@ module.exports = {
         let checkPassword = ()=>{
             if (data["password"] != null) {
                 
-                const a = data["password"].search(/\s/g) < 0 && data["password"].match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/) != null;   
+                const a = validator.isStrongPassword(data["password"],{minLength: 6,minSymbols: 0})
                 if (!a) {
-                    return [a,"Invalid format on password"]
+                    return [a,"Invalid password format"]
                 }
                 return [a,"Please fill password"]
             }else{
