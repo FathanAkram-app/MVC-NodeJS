@@ -1,5 +1,6 @@
 
 const res = require('express/lib/response')
+const bcrypt = require('bcrypt');
 
 const { MongoClient } = require("mongodb");
 const { failedWithMessageResponse, successWithMessageResponse } = require('../views/json_responses/response');
@@ -40,18 +41,14 @@ module.exports = {
                 var dbUsers = dbo.collection("users")
                 checkDBError(err,res)
                     .then(async (err)=>{
-                        if (!err) {
-                            return await dbUsers.findOne({username: user.jsonObject().username}), null
-                                
-                        }else return null,"DB Error"
-                        
+                        if (!err) return await dbUsers.findOne({username: user.jsonObject().username}), null
+                        else return null,"DB Error"
                     })
                     .then(async (result,err)=>{
                         
                         if (!err) {
-                            if (!result) {
-                                return await dbUsers.findOne({email: user.jsonObject().email})
-                            }else{
+                            if (!result) return await dbUsers.findOne({email: user.jsonObject().email})
+                            else{
                                 res.send(failedWithMessageResponse(400,"username already exist."))
                                 db.close()
                             }
@@ -90,6 +87,42 @@ module.exports = {
         
 
     },
+    loginDB: async (data,res,token)=>{
+        try {
+            const user = new User(data.username, data.password)
+            MongoClient.connect(mongoUri, (err,db)=>{
+                var dbo = db.db("testing");
+                var dbUsers = dbo.collection("users")
+                checkDBError(err,res)
+                    .then(async (err)=>{
+                        if (!err) return false
+                        else return "DB Error"
+                    })
+                    .then(async(err)=>{
+                        const usr = await dbUsers.findOne({"username": user.jsonObject().username})
+                        if (!err && usr) {
+                            const compare = await bcrypt.compare(user.password,usr.password)
+                            if (compare) {
+                                await dbUsers.updateOne({username: usr.username},{$set:{token:token}},{upsert:false})
+                                res.send(successWithMessageResponse("successfully loggedin"))
+                                db.close()
+                            }else{
+                                res.send(failedWithMessageResponse(400,"Username/Password is wrong"))
+                                db.close()
+                            }
+                        }else if (!usr && !err) {
+                            res.send(failedWithMessageResponse(400,"Username/Password is wrong"))
+                            db.close()
+                        }else{
+                            res.send(failedWithMessageResponse(400,err))
+                            db.close()
+                        }
+                    })
+            })
+        } catch (err){
+            console.log(err)
+        }
+    }
     // registerDB: async (data) =>{
 
     //     const conn = client()
