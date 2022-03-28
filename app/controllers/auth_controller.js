@@ -32,14 +32,7 @@ module.exports = {
 
     logoutController : (req, res) => {
         if(clientAuthentication(req)){
-            logoutDB(auth(req).token).then((data)=>{
-                if (data.rowCount > 0){
-                    res.send(successWithMessageResponse("successfully logged-out"))
-                }else{
-                    res.send(failedWithMessageResponse(400, "session not found or user has already logged out"))
-                }
-                
-            })
+            logoutDB(req.body.token,res)
         }else{
             res.send(clientAuthFailedResponse)
         }

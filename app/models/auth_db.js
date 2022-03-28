@@ -53,7 +53,7 @@ module.exports = {
                                 db.close()
                             }
                         }else{
-                            res.send(failedWithMessageResponse(400,"something went wrong"))
+                            res.send(failedWithMessageResponse(502,err))
                             db.close()
                         }
                     })
@@ -104,7 +104,7 @@ module.exports = {
                             const compare = await bcrypt.compare(user.password,usr.password)
                             if (compare) {
                                 await dbUsers.updateOne({username: usr.username},{$set:{token:token}},{upsert:false})
-                                res.send(successWithMessageResponse("successfully loggedin"))
+                                res.send(successWithMessageResponse("successfully logged-in"))
                                 db.close()
                             }else{
                                 res.send(failedWithMessageResponse(400,"Username/Password is wrong"))
@@ -114,7 +114,7 @@ module.exports = {
                             res.send(failedWithMessageResponse(400,"Username/Password is wrong"))
                             db.close()
                         }else{
-                            res.send(failedWithMessageResponse(400,err))
+                            res.send(failedWithMessageResponse(502,err))
                             db.close()
                         }
                     })
@@ -122,45 +122,33 @@ module.exports = {
         } catch (err){
             console.log(err)
         }
+    },
+    logoutDB: async(token,res)=>{
+        MongoClient.connect(mongoUri,(err, db)=>{
+            var dbo = db.db("testing");
+            var dbUsers = dbo.collection("users")
+            checkDBError(err,res)
+                .then(async (err)=>{
+                    if (!err) return false
+                    else return "DB Error"
+                })
+                .then(async(err)=>{
+                    if (!err) return await dbUsers.updateOne({token: token},{$set: {token: null}},{upsert: false})
+                    else{
+                        res.send(failedWithMessageResponse(502, "DB ERROR"))
+                        return null
+                    }
+                })
+                .then((result)=>{
+                    if (result.modifiedCount>0) {
+                        res.send(successWithMessageResponse("successfully logged-out"))
+                    }else{
+                        res.send(failedWithMessageResponse("Session Expired"))
+                    }
+
+                    db.close()
+                })
+
+        })
     }
-    // registerDB: async (data) =>{
-
-    //     const conn = client()
-    //     await conn.connect()
-    //     try {
-    //         const res = await conn.query("INSERT INTO users (username, password, email, nama,kelas) VALUES ('"+data.username+"', '"+data.password+"', '"+data.email+"', '"+data.nama+"',  '"+data.kelas+"');")
-    //     } catch (error) {
-    //         return error
-    //     }
-        
-    //     await conn.end()
-    //     return null
-    // },
-    // findUserByUsernameDB: async (username)=>{
-    //     const conn = client()
-    //     await conn.connect()
-    //     const res = await conn.query("SELECT * FROM users WHERE username = '"+username+"'")
-        
-    //     await conn.end()
-    //     return res
-    // },
-    // updateTokenDB: async (username, token) =>{
-    //     const conn = client()
-    //     await conn.connect()
-    //     await conn.query("UPDATE users SET token = '"+token+"' WHERE username = '"+username+"'")
-    //     const res = await conn.query("SELECT * FROM users WHERE token = '"+token+"'")
-    //     await conn.end()
-    //     return res
-
-    // },
-    // logoutDB: async (token) => {
-    //     const conn = client()
-    //     await conn.connect()
-        
-    //     await conn.query("UPDATE users SET token = NULL WHERE token = '"+token+"';")
-        
-
-    //     await conn.end()
-    //     return res
-    // }
 }
