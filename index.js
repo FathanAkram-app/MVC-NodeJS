@@ -4,17 +4,16 @@ const app = express()
 
 const bodyParser = require('body-parser')
 
-// https
-// const fs = require('fs')
-// const https = require('https');
-// const server = https.createServer({
-//   key:fs.readFileSync(__dirname+"/certificate/key.pem"),
-//   cert:fs.readFileSync(__dirname+"/certificate/cert.pem")
-// },app);
-// const port = 3443 
-const http = require('http');
-const server = http.createServer(app);
-const port = 3000 
+const fs = require('fs')
+const https = require('https');
+const server = https.createServer({
+  key:fs.readFileSync(__dirname+"/certificate/key.pem"),
+  cert:fs.readFileSync(__dirname+"/certificate/cert.pem")
+},app);
+const port = 3443 
+// const http = require('http');
+// const server = http.createServer(app);
+// const port = 3000 
 
 const { initRoutes } = require('./app/routes')
 
