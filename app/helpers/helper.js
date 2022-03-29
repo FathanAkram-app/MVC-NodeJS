@@ -1,8 +1,8 @@
-const { Client } = require('pg')
+// const { Client } = require('pg')
 const version = require('../../package.json')
 require('dotenv').config()
 const { MongoClient } = require("mongodb");
-const mongoUri = 'mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.3.1'
+const mongoUri = 'mongodb://172.17.0.3:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.3.1'
 const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
 var validator = require('validator');
 
@@ -50,15 +50,15 @@ module.exports = {
         return data["name"] != null && data["description"] != null && data["category"] != null && data["name"] != null && data["location"] != null && data["storeid"] != null
         
     },
-    client : () => {
-        return new Client({
-            user: process.env.DB_USER,
-            host: process.env.DB_HOST,
-            database: process.env.DB_NAME,
-            password: process.env.DB_PASS,
-            port: process.env.DB_PORT,
-        })
-    },
+    // client : () => {
+    //     return new Client({
+    //         user: process.env.DB_USER,
+    //         host: process.env.DB_HOST,
+    //         database: process.env.DB_NAME,
+    //         password: process.env.DB_PASS,
+    //         port: process.env.DB_PORT,
+    //     })
+    // },
     clientAuthentication : (req)=>{
         if (req.headers.authorization != null) {
             return JSON.parse(Buffer.from(req.headers.authorization, 'base64').toString('ascii')).serverkey == version["serverkey"]    

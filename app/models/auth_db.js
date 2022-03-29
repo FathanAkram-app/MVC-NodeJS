@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const { MongoClient } = require("mongodb");
 const { failedWithMessageResponse, successWithMessageResponse } = require('../views/json_responses/response');
 
-const mongoUri = 'mongodb://127.0.0.1:27017/'
+const mongoUri = 'mongodb://172.17.0.3:27017/'
 
 class User{
     constructor(username, password, email, nama) {
@@ -25,7 +25,6 @@ class User{
 }
 const checkDBError = (err, res) => {
     if (err) {
-        res.send(failedWithMessageResponse(400,"something went wrong"))
         
         return Promise.resolve("something went wrong")
         
@@ -36,49 +35,34 @@ module.exports = {
     registerDB: async (data,res)=>{
         try {
             const user = new User(data.username, data.password, data.email, data.nama)
-            MongoClient.connect(mongoUri, (err,db)=>{
-                var dbo = db.db("testing");
-                var dbUsers = dbo.collection("users")
-                checkDBError(err,res)
-                    .then(async (err)=>{
-                        if (!err) return await dbUsers.findOne({username: user.jsonObject().username}), null
-                        else return null,"DB Error"
-                    })
-                    .then(async (result,err)=>{
-                        
-                        if (!err) {
-                            if (!result) return await dbUsers.findOne({email: user.jsonObject().email})
-                            else{
-                                res.send(failedWithMessageResponse(400,"username already exist."))
-                                db.close()
-                            }
-                        }else{
-                            res.send(failedWithMessageResponse(502,err))
-                            db.close()
-                        }
-                    })
-                    .then(async (result)=>{
-                        
-                        if (!result) {
+            MongoClient.connect(mongoUri, async (err,db)=>{
+                var dbUsers = null
+                    
+                if (!err) {
+                    var dbo = db.db("testing");
+                    dbUsers = dbo.collection("users")
+                    const usrname = await dbUsers.findOne({username: user.jsonObject().username})
+                    if (!usrname) {
+                        const email = await dbUsers.findOne({email: user.jsonObject().email})
+                        if (!email) {
                             await dbUsers.insertOne(user.jsonObject())
-                            return null
-                                
-                        }else{
-                            db.close()
-                            return "email already exist."
-                        }
-                    })
-                    .then((err)=>{
-                                    
-                        if (err) {
-                            res.send(failedWithMessageResponse(400,err))
-                            
-                        }
-                        else {
                             res.send(successWithMessageResponse("successfully registered an account"))
+                            db.close()
+                        }else{
+                            res.send(failedWithMessageResponse(400,"email already exist."))
+                            db.close()
                         }
+                    }
+                    else{
+                        res.send(failedWithMessageResponse(400,"username already exist."))
                         db.close()
-                    }) 
+                    }
+                }else{
+                    res.send(failedWithMessageResponse(502,err))
+                }
+            
+                
+            
                 
             })
         } catch (error) {
